@@ -1,0 +1,15 @@
+/* src/styles/global.css */
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #1a2c23; /* Fondo oscuro */
+  color: #e2e8f0; /* Texto claro */
+}

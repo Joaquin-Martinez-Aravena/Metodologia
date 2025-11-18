@@ -1,0 +1,30 @@
+{
+  "name": "farmalink",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "parcel index.html",
+    "build": "parcel build index.html",
+    "preview": "parcel serve dist",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.4.0",
+    "parcel": "^2.16.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.16"
+  }
+}

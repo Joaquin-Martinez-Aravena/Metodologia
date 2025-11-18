@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* Ocupa toda la pantalla */
+@layer base {
+  html, body, #root { @apply h-full w-full; }
+  body { @apply m-0 block; }
+}
+
+/* === Variables del tema === */
+/* Detecta automáticamente el modo del sistema */
+@layer base {
+  :root {
+    /* Oscuro (por defecto si el sistema lo prefiere) */
+    --app-bg: rgb(15, 23, 42); /* slate-950 */
+    --app-fg: rgb(226, 232, 240); /* slate-100 */
+    --card-bg: rgb(30, 25, 35);
+  }
+
+  /* Modo claro del sistema */
+  @media (prefers-color-scheme: light) {
+    :root {
+      --app-bg: rgb(248, 250, 252); /* slate-50 */
+      --app-fg: rgb(15, 23, 42); /* slate-950 */
+      --card-bg: rgb(226, 232, 240);
+    }
+  }
+}
