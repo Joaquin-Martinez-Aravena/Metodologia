@@ -36,23 +36,25 @@ const logs = [
 /* -----------------------------------------
    Utils visuales
 ----------------------------------------- */
-const Pill = ({ children, color }) => (
-  <span
-    className={`inline-flex items-center px-2 py-1 text-xs font-medium ${color} rounded-full`}
-  >
-    {children}
-  </span>
+const Pill = ({ children, variant }) => (
+  <span className={`pill-alert ${variant}`}>{children}</span>
 );
+
+function pillVariant(estado) {
+  switch (estado) {
+    case "Vencido":
+      return "pill-alert--vencido";
+    case "Por vencer":
+      return "pill-alert--por-vencer";
+    case "En stock bajo":
+      return "pill-alert--stock-bajo";
+    default:
+      return "pill-alert--default";
+  }
+}
 
 /* -----------------------------------------
    Mapeo de resumen de alertas desde la API
-   API:
-   {
-     "stock_bajo": 2,
-     "por_vencer": 0,
-     "vencidos": 0,
-     "total_alertas": 2
-   }
 ----------------------------------------- */
 function mapResumenAlertas(data) {
   const src = data && typeof data === "object" ? data : {};
@@ -72,7 +74,6 @@ function mapResumenAlertas(data) {
    Componente principal
 ----------------------------------------- */
 export default function Alertas() {
-  // estado para el RESUMEN que viene de la API
   const [alertasResumen, setAlertasResumen] = useState({
     stockLow: 0,
     porVencer: 0,
@@ -82,7 +83,6 @@ export default function Alertas() {
   const [loadingAlertas, setLoadingAlertas] = useState(false);
   const [errorAlertas, setErrorAlertas] = useState("");
 
-  // cargar resumen desde la API al montar
   useEffect(() => {
     async function cargarAlertasDesdeAPI() {
       console.log("🔍 Montando Alertas: llamando getAlertas()");
@@ -129,57 +129,44 @@ export default function Alertas() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="alertas-wrapper">
       {/* ---------- Resumen numérico desde la API ---------- */}
-      <section className="rounded-lg border border-slate-200 bg-[var(--card-bg)] shadow-sm dark:border-slate-700">
-        <header className="border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-          <h2 className="text-lg font-semibold text-indigo-600">
-            Resumen de Alertas
-          </h2>
+      <section className="alertas-card">
+        <header className="alertas-card-header">
+          <h2 className="alertas-card-title">Resumen de Alertas</h2>
         </header>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-blue-700 text-white">
+        <div className="alertas-table-container">
+          <table className="table-main">
+            <thead className="table-main-head-alertas">
               <tr>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Stock bajo
-                </th>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Por vencer
-                </th>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Vencidos
-                </th>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Total alertas
-                </th>
+                <th className="table-head-cell-xs">Stock bajo</th>
+                <th className="table-head-cell-xs">Por vencer</th>
+                <th className="table-head-cell-xs">Vencidos</th>
+                <th className="table-head-cell-xs">Total alertas</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="table-main-body">
               {loadingAlertas && (
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
-                  >
+                  <td colSpan={4} className="table-main-message">
                     Cargando alertas…
                   </td>
                 </tr>
               )}
 
               {!loadingAlertas && !errorAlertas && (
-                <tr className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
-                  <td className="whitespace-nowrap px-6 py-4 text-base text-slate-700 dark:text-slate-200">
+                <tr className="table-main-row">
+                  <td className="table-cell">
                     {alertasResumen.stockLow}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-base text-slate-700 dark:text-slate-200">
+                  <td className="table-cell">
                     {alertasResumen.porVencer}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-base text-slate-700 dark:text-slate-200">
+                  <td className="table-cell">
                     {alertasResumen.vencidos}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-base text-slate-700 dark:text-slate-200">
+                  <td className="table-cell">
                     {alertasResumen.total}
                   </td>
                 </tr>
@@ -189,10 +176,7 @@ export default function Alertas() {
                 !errorAlertas &&
                 alertasResumen.total === 0 && (
                   <tr>
-                    <td
-                      colSpan={4}
-                      className="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
-                    >
+                    <td colSpan={4} className="table-main-message">
                       No hay alertas activas.
                     </td>
                   </tr>
@@ -200,10 +184,7 @@ export default function Alertas() {
 
               {errorAlertas && (
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="px-6 py-8 text-center text-sm text-rose-600 dark:text-rose-300"
-                  >
+                  <td colSpan={4} className="table-main-message-error">
                     {errorAlertas}
                   </td>
                 </tr>
@@ -214,71 +195,38 @@ export default function Alertas() {
       </section>
 
       {/* ---------- Productos en alerta (mock por ahora) ---------- */}
-      <section className="rounded-lg border border-slate-200 bg-[var(--card-bg)] shadow-sm dark:border-slate-700">
-        <header className="border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-          <h2 className="text-lg font-semibold text-indigo-600">
-            Productos en Alerta
-          </h2>
+      <section className="alertas-card">
+        <header className="alertas-card-header">
+          <h2 className="alertas-card-title">Productos en Alerta</h2>
         </header>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-blue-700 text-white">
+        <div className="alertas-table-container">
+          <table className="table-main">
+            <thead className="table-main-head-alertas">
               <tr>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Nombre
-                </th>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Categoría
-                </th>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Estado
-                </th>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Fecha de Vencimiento
-                </th>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Lote
-                </th>
-                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold">
-                  Descripción
-                </th>
+                <th className="table-head-cell-xs">Nombre</th>
+                <th className="table-head-cell-xs">Categoría</th>
+                <th className="table-head-cell-xs">Estado</th>
+                <th className="table-head-cell-xs">Fecha de Vencimiento</th>
+                <th className="table-head-cell-xs">Lote</th>
+                <th className="table-head-cell-xs">Descripción</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="table-main-body">
               {ALERTAS_PRODUCTOS_MOCK.map((alerta) => (
-                <tr
-                  key={alerta.id}
-                  className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
-                >
-                  <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
-                    {alerta.nombre}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-slate-800 dark:text-slate-100">
-                    {alerta.categoria}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3">
-                    <Pill
-                      color={
-                        alerta.estado === "Vencido"
-                          ? "bg-red-700 text-white"
-                          : alerta.estado === "Por vencer"
-                          ? "bg-orange-600 text-white"
-                          : alerta.estado === "En stock bajo"
-                          ? "bg-green-600 text-white"
-                          : "bg-gray-300 text-gray-700"
-                      }
-                    >
+                <tr key={alerta.id} className="table-main-row">
+                  <td className="table-cell-small-muted">{alerta.nombre}</td>
+                  <td className="table-cell-strong">{alerta.categoria}</td>
+                  <td className="table-cell">
+                    <Pill variant={pillVariant(alerta.estado)}>
                       {alerta.estado}
                     </Pill>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                  <td className="table-cell-small-muted">
                     {alerta.fechaVencimiento}
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
-                    {alerta.lote}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400">
+                  <td className="table-cell-small-muted">{alerta.lote}</td>
+                  <td className="table-cell-small-muted">
                     {alerta.descripcion}
                   </td>
                 </tr>
@@ -286,10 +234,7 @@ export default function Alertas() {
 
               {ALERTAS_PRODUCTOS_MOCK.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
-                  >
+                  <td colSpan={6} className="table-main-message">
                     No hay productos en alerta en este momento.
                   </td>
                 </tr>
@@ -300,11 +245,11 @@ export default function Alertas() {
       </section>
 
       {/* ---------- Log de alertas (mock) ---------- */}
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold text-indigo-600">Log de Alertas</h2>
-        <div className="bg-gray-800 rounded-lg shadow-md p-4">
+      <section className="alertas-log-section">
+        <h2 className="alertas-log-title">Log de Alertas</h2>
+        <div className="alertas-log-box">
           {logs.map((log) => (
-            <div key={log.id} className="text-white mb-2">
+            <div key={log.id} className="alertas-log-item">
               <p>{log.mensaje}</p>
             </div>
           ))}

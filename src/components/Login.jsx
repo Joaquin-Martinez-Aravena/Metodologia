@@ -1,6 +1,6 @@
 // src/components/Login.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Usaremos react-router-dom para redirigir
+import { useNavigate } from "react-router-dom";
 
 function Login({ setUserRole }) {
   const [email, setEmail] = useState("");
@@ -8,49 +8,47 @@ function Login({ setUserRole }) {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Función para manejar el inicio de sesión
   const handleLogin = (e) => {
     e.preventDefault();
-    // Verificar las credenciales
     if (email === "Administrador@gmail.com" && password === "adm123") {
       setUserRole("admin");
-      navigate("/dashboard"); // Redirigir a la sección de administración
+      navigate("/dashboard");
     } else if (email === "Empleado@gmail.com" && password === "empleado123") {
       setUserRole("employee");
-      navigate("/dashboard"); // Redirigir a la sección de empleado
+      navigate("/dashboard");
     } else {
       setError("Credenciales incorrectas.");
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="w-96 p-8 border rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center mb-6">Iniciar sesión</h2>
+    <div className="login-page-wrapper">
+      <div className="login-card">
+        <h2 className="login-title">Iniciar sesión</h2>
         <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label className="block text-sm">Correo electrónico</label>
+          <div className="login-form-group">
+            <label className="login-label">Correo electrónico</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="login-input"
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm">Contraseña</label>
+          <div className="login-form-group">
+            <label className="login-label">Contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
+              className="login-input"
               required
             />
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <div className="flex justify-center mt-6">
-            <button type="submit" className="px-6 py-2 bg-blue-500 text-white rounded-md">
+          {error && <p className="login-error">{error}</p>}
+          <div className="login-button-row">
+            <button type="submit" className="login-button">
               Iniciar sesión
             </button>
           </div>

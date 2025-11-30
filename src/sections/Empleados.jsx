@@ -3,12 +3,8 @@ import React, { useEffect, useState } from "react";
 import { getEmpleados } from "../api";
 
 // Pill reutilizable
-const Pill = ({ children, color }) => (
-  <span
-    className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${color}`}
-  >
-    {children}
-  </span>
+const Pill = ({ children, variant }) => (
+  <span className={`pill-status ${variant}`}>{children}</span>
 );
 
 // 🔹 Función pura: SOLO transforma la data, sin hooks ni setState
@@ -35,16 +31,16 @@ function mapListaEmpleados(data) {
   return normalizados;
 }
 
-// clases de color según estado
-function statusClasses(status) {
+// clases de color según estado (mapeo a variantes de CSS)
+function statusVariant(status) {
   switch (status) {
-    case "Disponible": // Verde
-      return "bg-emerald-500/10 text-emerald-300 border border-emerald-500/50";
-    case "En turno": // Rojo
-      return "bg-red-500/10 text-red-300 border border-red-500/50";
-    case "En descanso": // Naranja
+    case "Disponible":
+      return "pill-status--disponible"; // Verde
+    case "En turno":
+      return "pill-status--enturno"; // Rojo
+    case "En descanso":
     default:
-      return "bg-orange-500/10 text-orange-300 border border-orange-500/50";
+      return "pill-status--descanso"; // Naranja
   }
 }
 
@@ -53,7 +49,7 @@ export default function Empleados() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // para añadir empleados
+  // para añadir empleados (solo front)
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     rut: "",
@@ -143,17 +139,15 @@ export default function Empleados() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1500px]">
-      <section className="rounded-lg border border-slate-200 bg-[var(--card-bg)] shadow-sm dark:border-slate-700">
-        <header className="flex items-center justify-between gap-3 border-b border-slate-200 px-6 py-4 dark:border-slate-700">
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
-            Gestión de Empleados
-          </h2>
+    <div className="empleados-wrapper">
+      <section className="empleados-section">
+        <header className="empleados-header">
+          <h2 className="empleados-title">Gestión de Empleados</h2>
 
           <button
             type="button"
             onClick={() => setShowForm((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="empleados-add-btn"
           >
             <span>+</span>
             <span>Nuevo Empleado</span>
@@ -162,57 +156,49 @@ export default function Empleados() {
 
         {/* Formulario para añadir empleado */}
         {showForm && (
-          <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-700">
-            <form
-              className="grid grid-cols-1 gap-3 sm:grid-cols-5 items-end"
-              onSubmit={handleAddEmployee}
-            >
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-300">
-                  RUT
-                </label>
+          <div className="empleados-form-container">
+            <form className="empleados-form" onSubmit={handleAddEmployee}>
+              <div className="empleados-field">
+                <label className="empleados-field-label">RUT</label>
                 <input
                   type="text"
                   value={form.rut}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, rut: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  className="empleados-input"
                   placeholder="11.111.111-1"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-300">
-                  Nombre
-                </label>
+
+              <div className="empleados-field">
+                <label className="empleados-field-label">Nombre</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, name: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  className="empleados-input"
                   placeholder="Nombre"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-300">
-                  Apellido
-                </label>
+
+              <div className="empleados-field">
+                <label className="empleados-field-label">Apellido</label>
                 <input
                   type="text"
                   value={form.lastname}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, lastname: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  className="empleados-input"
                   placeholder="Apellido"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-300">
-                  Edad
-                </label>
+
+              <div className="empleados-field">
+                <label className="empleados-field-label">Edad</label>
                 <input
                   type="number"
                   min="0"
@@ -220,26 +206,24 @@ export default function Empleados() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, age: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  className="empleados-input"
                   placeholder="Edad"
                 />
               </div>
-              <div className="flex items-end gap-2">
+
+              <div className="empleados-field empleados-field-actions">
                 <select
                   value={form.status}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, status: e.target.value }))
                   }
-                  className="flex-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                  className="empleados-select"
                 >
                   <option>Disponible</option>
                   <option>En turno</option>
                   <option>En descanso</option>
                 </select>
-                <button
-                  type="submit"
-                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
+                <button type="submit" className="empleados-save-btn">
                   Guardar
                 </button>
               </div>
@@ -248,35 +232,22 @@ export default function Empleados() {
         )}
 
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead className="bg-blue-50 text-slate-600 dark:bg-blue-800 dark:text-slate-300">
+          <table className="table-main">
+            <thead className="table-main-head">
               <tr>
-                <th className="whitespace-nowrap px-6 py-4 text-left text-base font-semibold">
-                  RUT
-                </th>
-                <th className="whitespace-nowrap px-6 py-4 text-left text-base font-semibold">
-                  Nombre
-                </th>
-                <th className="whitespace-nowrap px-6 py-4 text-left text-base font-semibold">
-                  Edad
-                </th>
-                <th className="whitespace-nowrap px-6 py-4 text-left text-base font-semibold">
-                  Estado
-                </th>
-                <th className="whitespace-nowrap px-6 py-4 text-left text-base font-semibold">
-                  Acciones
-                </th>
+                <th className="table-main-head-cell">RUT</th>
+                <th className="table-main-head-cell">Nombre</th>
+                <th className="table-main-head-cell">Edad</th>
+                <th className="table-main-head-cell">Estado</th>
+                <th className="table-main-head-cell">Acciones</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="table-main-body">
               {/* Estado: cargando */}
               {loading && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
-                  >
+                  <td colSpan={5} className="table-main-message">
                     Cargando empleados…
                   </td>
                 </tr>
@@ -285,10 +256,7 @@ export default function Empleados() {
               {/* Estado: error */}
               {!loading && error && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-8 text-center text-sm text-red-600 dark:text-red-400"
-                  >
+                  <td colSpan={5} className="table-main-message-error">
                     {error}
                   </td>
                 </tr>
@@ -301,56 +269,51 @@ export default function Empleados() {
                   const isConfirming = confirmId === e.id;
 
                   return (
-                    <tr
-                      key={e.id}
-                      className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
-                    >
+                    <tr key={e.id} className="table-main-row">
                       {/* RUT */}
-                      <td className="whitespace-nowrap px-6 py-4 text-base text-slate-500 dark:text-slate-400">
-                        {e.rut}
-                      </td>
+                      <td className="table-cell-muted">{e.rut}</td>
 
                       {/* Nombre + Apellido */}
-                      <td className="whitespace-nowrap px-6 py-4 text-base font-medium text-slate-800 dark:text-slate-100">
+                      <td className="table-cell-strong">
                         {e.name} {e.lastname}
                       </td>
 
                       {/* Edad */}
-                      <td className="whitespace-nowrap px-6 py-4 text-base text-slate-700 dark:text-slate-200">
-                        {e.age}
-                      </td>
+                      <td className="table-cell">{e.age}</td>
 
                       {/* Estado con colores */}
-                      <td className="whitespace-nowrap px-6 py-4 text-base">
-                        <Pill color={statusClasses(e.status)}>{e.status}</Pill>
+                      <td className="table-cell">
+                        <Pill variant={statusVariant(e.status)}>
+                          {e.status}
+                        </Pill>
                       </td>
 
                       {/* Acciones */}
-                      <td className="whitespace-nowrap px-6 py-4 text-sm">
+                      <td className="table-cell-actions">
                         {!isConfirming ? (
                           <button
                             type="button"
                             onClick={() => askDelete(e.id)}
-                            className="rounded-md border border-red-500 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-400 dark:text-red-300 dark:hover:bg-red-950/40"
+                            className="btn-delete-main"
                           >
                             Eliminar
                           </button>
                         ) : (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                          <div className="empleados-confirm-actions">
+                            <span className="empleados-confirm-text">
                               ¿Confirmar?
                             </span>
                             <button
                               type="button"
                               onClick={() => confirmDelete(e.id)}
-                              className="rounded-md bg-red-600 px-2 py-1 text-xs font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                              className="btn-danger-xs"
                             >
                               Sí
                             </button>
                             <button
                               type="button"
                               onClick={cancelDelete}
-                              className="rounded-md border border-slate-400 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:border-slate-500 dark:text-slate-200 dark:hover:bg-slate-800/60"
+                              className="btn-outline-xs"
                             >
                               No
                             </button>
@@ -364,10 +327,7 @@ export default function Empleados() {
               {/* Sin resultados */}
               {!loading && !error && rows.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
-                  >
+                  <td colSpan={5} className="table-main-message">
                     No se encontraron empleados.
                   </td>
                 </tr>
