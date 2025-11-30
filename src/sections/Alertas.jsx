@@ -1,32 +1,11 @@
 // src/sections/Alertas.jsx
 import React, { useEffect, useState } from "react";
-import { getAlertas } from "../api";
 import { obtenerAlertas, limpiarAlertas } from "../alertasService";
 
 /* -----------------------------------------
-   Datos mock para la tabla de productos en alerta
-   (la API por ahora solo entrega el resumen)
+   Datos de productos en alerta (vacío por ahora)
 ----------------------------------------- */
-const ALERTAS_PRODUCTOS_MOCK = [
-  {
-    id: 1,
-    nombre: "Paracetamol 500mg",
-    categoria: "Analgésico",
-    estado: "Vencido",
-    fechaVencimiento: "2025-01-15",
-    lote: "A001",
-    descripcion: "Lote vencido, retirar del stock.",
-  },
-  {
-    id: 2,
-    nombre: "Amoxicilina 500mg",
-    categoria: "Antibiótico",
-    estado: "Por vencer",
-    fechaVencimiento: "2025-02-01",
-    lote: "B010",
-    descripcion: "Revisar rotación, fecha próxima.",
-  },
-];
+const ALERTAS_PRODUCTOS_MOCK = [];
 
 /* -----------------------------------------
    Utils visuales
@@ -69,91 +48,22 @@ function AlertaBadge({ tipo }) {
 }
 
 /* -----------------------------------------
-   Mapeo de resumen de alertas desde la API
------------------------------------------ */
-function mapResumenAlertas(data) {
-  const src = data && typeof data === "object" ? data : {};
-
-  const normalizadasAlertas = {
-    stockLow: src.stock_bajo ?? 0,
-    porVencer: src.por_vencer ?? 0,
-    vencidos: src.vencidos ?? 0,
-    total: src.total_alertas ?? 0,
-  };
-
-  console.log("📦 Alertas normalizadas:", normalizadasAlertas);
-  return normalizadasAlertas;
-}
-
-/* -----------------------------------------
    Componente principal
 ----------------------------------------- */
 export default function Alertas() {
-  const [alertasResumen, setAlertasResumen] = useState({
-    stockLow: 0,
-    porVencer: 0,
-    vencidos: 0,
-    total: 0,
-  });
-  const [loadingAlertas, setLoadingAlertas] = useState(false);
-  const [errorAlertas, setErrorAlertas] = useState("");
-
   // Log de alertas locales
   const [alertasLog, setAlertasLog] = useState([]);
   const [expandedAlertId, setExpandedAlertId] = useState(null);
-
-  useEffect(() => {
-    async function cargarAlertasDesdeAPI() {
-      console.log("🔍 Montando Alertas: llamando getAlertas()");
-
-      try {
-        setLoadingAlertas(true);
-        setErrorAlertas("");
-
-        const data = await getAlertas();
-
-        if (data && data.__error) {
-          console.warn("⚠️ Error lógico getAlertas:", data);
-          setErrorAlertas(
-            `No se pudieron cargar las alertas${
-              data.status ? ` (status: ${data.status})` : ""
-            }`
-          );
-          setAlertasResumen({
-            stockLow: 0,
-            porVencer: 0,
-            vencidos: 0,
-            total: 0,
-          });
-          return;
-        }
-
-        const mapped = mapResumenAlertas(data);
-        setAlertasResumen(mapped);
-      } catch (err) {
-        console.error("💥 Excepción en cargarAlertas:", err);
-        setErrorAlertas("No se pudieron cargar las alertas desde la API.");
-        setAlertasResumen({
-          stockLow: 0,
-          porVencer: 0,
-          vencidos: 0,
-          total: 0,
-        });
-      } finally {
-        setLoadingAlertas(false);
-      }
-    }
-
-    cargarAlertasDesdeAPI();
-
-    // Cargar alertas del localStorage
-    cargarAlertasLog();
-  }, []);
 
   const cargarAlertasLog = () => {
     const alertas = obtenerAlertas();
     setAlertasLog(alertas);
   };
+
+  useEffect(() => {
+    // Cargar alertas del localStorage al montar
+    cargarAlertasLog();
+  }, []);
 
   const handleLimpiarLog = () => {
     if (window.confirm("¿Estás seguro de que quieres eliminar todo el historial de alertas?")) {
@@ -169,71 +79,7 @@ export default function Alertas() {
 
   return (
     <div className="alertas-wrapper">
-      {/* ---------- Resumen numérico desde la API ---------- */}
-      <section className="alertas-card">
-        <header className="alertas-card-header">
-          <h2 className="alertas-card-title">Resumen de Alertas</h2>
-        </header>
-
-        <div className="alertas-table-container">
-          <table className="table-main">
-            <thead className="table-main-head-alertas">
-              <tr>
-                <th className="table-head-cell-xs">Stock bajo</th>
-                <th className="table-head-cell-xs">Por vencer</th>
-                <th className="table-head-cell-xs">Vencidos</th>
-                <th className="table-head-cell-xs">Total alertas</th>
-              </tr>
-            </thead>
-            <tbody className="table-main-body">
-              {loadingAlertas && (
-                <tr>
-                  <td colSpan={4} className="table-main-message">
-                    Cargando alertas…
-                  </td>
-                </tr>
-              )}
-
-              {!loadingAlertas && !errorAlertas && (
-                <tr className="table-main-row">
-                  <td className="table-cell">
-                    {alertasResumen.stockLow}
-                  </td>
-                  <td className="table-cell">
-                    {alertasResumen.porVencer}
-                  </td>
-                  <td className="table-cell">
-                    {alertasResumen.vencidos}
-                  </td>
-                  <td className="table-cell">
-                    {alertasResumen.total}
-                  </td>
-                </tr>
-              )}
-
-              {!loadingAlertas &&
-                !errorAlertas &&
-                alertasResumen.total === 0 && (
-                  <tr>
-                    <td colSpan={4} className="table-main-message">
-                      No hay alertas activas.
-                    </td>
-                  </tr>
-                )}
-
-              {errorAlertas && (
-                <tr>
-                  <td colSpan={4} className="table-main-message-error">
-                    {errorAlertas}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* ---------- Productos en alerta (mock por ahora) ---------- */}
+      {/* ---------- Productos en alerta (sin datos por ahora) ---------- */}
       <section className="alertas-card">
         <header className="alertas-card-header">
           <h2 className="alertas-card-title">Productos en Alerta</h2>
@@ -314,7 +160,7 @@ export default function Alertas() {
                     {alerta.fechaLegible}
                   </span>
                 </div>
-                
+
                 <p className="alertas-log-item-mensaje">{alerta.mensaje}</p>
 
                 {alerta.detalles && (
@@ -325,7 +171,7 @@ export default function Alertas() {
                     >
                       {expandedAlertId === alerta.id ? "▼ Ocultar detalles" : "▶ Ver detalles"}
                     </button>
-                    
+
                     {expandedAlertId === alerta.id && (
                       <pre className="alertas-log-item-json">
                         {JSON.stringify(alerta.detalles, null, 2)}
