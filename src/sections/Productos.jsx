@@ -252,7 +252,7 @@ export default function Productos() {
 
   useEffect(() => {
     cargarProductosDesdeAPI();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // === Crear producto usando la API ===

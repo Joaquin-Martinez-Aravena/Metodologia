@@ -1,21 +1,27 @@
 // src/components/Sidebar.jsx
 import React from "react";
 
-export default function Sidebar({ active, onSelect, role }) {
+export default function Sidebar({ active, onSelect, role, onLogout }) {
   const menuItems = [
-    { key: "productos", label: "Productos", icon: "💊" },      // Medicamentos
-    { key: "compras",   label: "Compras",   icon: "🛒" },      // Carrito
+    { key: "productos", label: "Productos", icon: "💊" },
+    { key: "compras",   label: "Compras",   icon: "🛒" },
     ...(role === "admin"
       ? [
-          { key: "empleados", label: "Empleados", icon: "👥" }, // Personal
-          { key: "alertas",   label: "Alertas",   icon: "⚠️" }, // Alertas
+          { key: "empleados", label: "Empleados", icon: "👥" },
+          { key: "alertas",   label: "Alertas",   icon: "⚠️" },
         ]
       : []),
   ];
 
+  const handleLogoutClick = () => {
+    if (onLogout) {
+      onLogout();        // 👈 App borra user + sessionStorage y vuelve al login
+    }
+  };
+
   return (
     <div className="group relative h-full">
-      {/* Zona de hover */}
+      {/* Zona de hover para abrir el panel */}
       <div
         className="absolute inset-y-0 inset-x-0 z-20 cursor-pointer"
         aria-hidden="true"
@@ -27,7 +33,7 @@ export default function Sidebar({ active, onSelect, role }) {
           pointer-events-none
           absolute inset-y-0 left-0 z-30
           w-64
-          -translate-x-[290px]         /* casi todo oculto */
+          -translate-x-[290px]
           group-hover:translate-x-0
           transition-transform duration-200 ease-out
         "
@@ -41,13 +47,14 @@ export default function Sidebar({ active, onSelect, role }) {
             bg-slate-50 text-slate-900
             border-slate-200
             dark:bg-slate-950 dark:text-slate-100 dark:border-slate-800
+            flex flex-col
           "
         >
           <div className="mb-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Menú
           </div>
 
-          <ul className="space-y-1">
+          <ul className="space-y-1 flex-1">
             {menuItems.map((item) => {
               const isActive = active === item.key;
               return (
@@ -61,7 +68,6 @@ export default function Sidebar({ active, onSelect, role }) {
                         : "text-slate-700 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800",
                     ].join(" ")}
                   >
-                    {/* Icono con Tailwind */}
                     <span
                       className={[
                         "flex h-7 w-7 items-center justify-center rounded-md text-base",
@@ -72,13 +78,30 @@ export default function Sidebar({ active, onSelect, role }) {
                     >
                       {item.icon}
                     </span>
-
                     <span>{item.label}</span>
                   </button>
                 </li>
               );
             })}
           </ul>
+
+          {/* Botón Salir en el sidebar */}
+          <button
+            type="button"
+            onClick={handleLogoutClick}
+            className="
+              mt-4 w-full text-left rounded-md px-3 py-2 text-sm font-medium
+              flex items-center gap-3
+              text-red-500 hover:bg-red-50
+              dark:text-red-400 dark:hover:bg-slate-900
+              transition
+            "
+          >
+            <span className="flex h-7 w-7 items-center justify-center rounded-md text-base bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300">
+              🚪
+            </span>
+            <span>Salir</span>
+          </button>
 
           <div className="pointer-events-none absolute top-0 right-0 h-full w-2 bg-gradient-to-r from-black/10 to-transparent dark:from-black/30" />
         </nav>

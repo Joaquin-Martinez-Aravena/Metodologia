@@ -229,12 +229,6 @@ export default function App() {
               <span className="text-xs text-slate-500 dark:text-slate-400">
                 {user.email} ({user.role})
               </span>
-              <button
-                onClick={onLogout}
-                className="rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/70 px-2 py-1 text-sm text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800"
-              >
-                Salir
-              </button>
             </div>
             <h1 className="text-2xl font-semibold text-slate-800 dark:text-slate-100 m-0">
               💊 FarmaLink 💊
@@ -259,6 +253,7 @@ export default function App() {
               active={safeSection}
               onSelect={(key) => allowedKeys.includes(key) && setSection(key)}
               role={user.role}
+              onLogout={onLogout}
             />
           </aside>
 
