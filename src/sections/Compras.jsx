@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getCompras, crearCompra } from "../api";
+import { alertas } from "../alertasService";
 
 /* -----------------------------------------
    Helpers visuales
@@ -372,10 +373,10 @@ export default function Compras() {
       const idProveedor = proveedorMap[compraUI.proveedor] || 1;
 
       const detalle = compraUI.lineas.map((linea) => ({
-        id_producto: 1, // TODO: ID real del producto
+        id_producto: 1,
         costo_unitario: linea.precio,
         cantidad: linea.cantidad,
-        fecha_venc: "2026-12-31", // TODO: agregar al formulario
+        fecha_venc: "2026-12-31",
       }));
 
       const payload = {
@@ -394,33 +395,102 @@ export default function Compras() {
 
       if (resp.__error) {
         console.error("❌ Error:", resp);
+        
+        // 📢 Registrar alerta de error
+        alertas.error(
+          `Error al crear compra: ${compraUI.proveedor}`,
+          { 
+            proveedor: compraUI.proveedor,
+            total: compraUI.total,
+            error: resp 
+          }
+        );
+        
         setError("No se pudo guardar la compra. Revisa la consola para más detalles.");
         return;
       }
 
       console.log("✅ Compra guardada exitosamente!");
+
+      // 📢 Registrar alerta de éxito
+      alertas.success(
+        `Compra creada: ${compraUI.proveedor} - Total: $${compraUI.total.toFixed(2)}`,
+        {
+          id_compra: resp.id_compra,
+          proveedor: compraUI.proveedor,
+          fecha: compraUI.fecha,
+          total: compraUI.total,
+          productos: compraUI.lineas.length,
+          detalle: compraUI.lineas.map(l => ({
+            producto: l.producto,
+            cantidad: l.cantidad,
+            precio: l.precio
+          }))
+        }
+      );
+
       await cargarComprasDesdeAPI();
       setError("");
     } catch (err) {
       console.error("💥 Excepción:", err);
+      
+      // 📢 Registrar alerta de excepción
+      alertas.error(
+        `Excepción al crear compra: ${err.message}`,
+        { stack: err.stack }
+      );
+      
       setError("Error al guardar la compra.");
     }
   };
 
-  const toggleEstado = (id) =>
+  const toggleEstado = (id) => {
+    const compra = rows.find((c) => c.id === id);
+    const nuevoEstado = compra?.estado === "Completada" ? "Pendiente" : "Completada";
+    
     setRows((cur) =>
       cur.map((c) =>
         c.id === id
           ? {
               ...c,
-              estado: c.estado === "Completada" ? "Pendiente" : "Completada",
+              estado: nuevoEstado,
             }
           : c
       )
     );
+    
+    // 📢 Registrar cambio de estado
+    if (compra) {
+      alertas.info(
+        `Estado de compra cambiado: ${compra.proveedor} → ${nuevoEstado}`,
+        {
+          id: compra.id,
+          proveedor: compra.proveedor,
+          estadoAnterior: compra.estado,
+          estadoNuevo: nuevoEstado
+        }
+      );
+    }
+  };
 
-  const deleteCompra = (id) =>
+  const deleteCompra = (id) => {
+    const compra = rows.find((c) => c.id === id);
+    
     setRows((cur) => cur.filter((c) => c.id !== id));
+    
+    // 📢 Registrar alerta de eliminación
+    if (compra) {
+      alertas.warning(
+        `Compra eliminada: ${compra.proveedor} - $${compra.total.toFixed(2)}`,
+        {
+          id: compra.id,
+          proveedor: compra.proveedor,
+          fecha: compra.fecha,
+          total: compra.total
+        }
+      );
+    }
+  };
 
   return (
     <div className="compras-wrapper">

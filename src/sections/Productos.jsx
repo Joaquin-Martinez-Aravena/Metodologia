@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getProductos, crearProducto } from "../api";
+import { alertas } from "../alertasService";
 
 /* -----------------------------------------
    Badges y helpers pequeños
@@ -223,30 +224,67 @@ export default function Productos() {
   const handleCrearProducto = async (draft) => {
     console.log("🟢 POST creando producto:", draft);
 
-    let idCategoria = 1;
-    if (/antib/i.test(draft.category)) idCategoria = 2;
-    if (/vitam/i.test(draft.category)) idCategoria = 3;
+    try {
+      let idCategoria = 1;
+      if (/antib/i.test(draft.category)) idCategoria = 2;
+      if (/vitam/i.test(draft.category)) idCategoria = 3;
 
-    const payload = {
-      cod_producto: draft.code,
-      nombre: draft.name,
-      id_categoria: idCategoria,
-      umbral_stock: draft.threshold,
-      estado: draft.status === "Activo" ? "ACT" : "INA",
-    };
+      const payload = {
+        cod_producto: draft.code,
+        nombre: draft.name,
+        id_categoria: idCategoria,
+        umbral_stock: draft.threshold,
+        estado: draft.status === "Activo" ? "ACT" : "INA",
+      };
 
-    const resp = await crearProducto(payload);
+      const resp = await crearProducto(payload);
 
-    if (resp && resp.__error) {
-      console.warn("⚠️ Error al crear producto:", resp);
-      alert(
-        "No se pudo crear el producto en la API (revisa la consola para más detalle)."
+      if (resp && resp.__error) {
+        console.warn("⚠️ Error al crear producto:", resp);
+        
+        // 📢 Registrar alerta de error
+        alertas.error(
+          `Error al crear producto: ${draft.name}`,
+          {
+            codigo: draft.code,
+            nombre: draft.name,
+            error: resp
+          }
+        );
+        
+        alert(
+          "No se pudo crear el producto en la API (revisa la consola para más detalle)."
+        );
+        return;
+      }
+
+      // 📢 Registrar alerta de éxito
+      alertas.success(
+        `Producto creado: ${draft.name} (${draft.code})`,
+        {
+          id_producto: resp.id_producto,
+          codigo: draft.code,
+          nombre: draft.name,
+          categoria: draft.category,
+          umbral_stock: draft.threshold,
+          estado: draft.status
+        }
       );
-      return;
-    }
 
-    await cargarProductosDesdeAPI();
-    setOpenCreate(false);
+      await cargarProductosDesdeAPI();
+      setOpenCreate(false);
+      
+    } catch (err) {
+      console.error("💥 Excepción al crear producto:", err);
+      
+      // 📢 Registrar alerta de excepción
+      alertas.error(
+        `Excepción al crear producto: ${err.message}`,
+        { stack: err.stack }
+      );
+      
+      alert("Error inesperado al crear el producto.");
+    }
   };
 
   return (
@@ -329,7 +367,7 @@ export default function Productos() {
               {!loading && filtered.length === 0 && !error && (
                 <tr>
                   <td colSpan={5} className="table-main-message">
-                    No se encontraron productos para “{query}”.
+                    No se encontraron productos para "{query}".
                   </td>
                 </tr>
               )}

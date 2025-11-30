@@ -1,6 +1,7 @@
 // src/sections/Empleados.jsx
 import React, { useEffect, useState } from "react";
-import { getEmpleados } from "../api";
+import { getEmpleados, crearEmpleado } from "../api";
+import { alertas } from "../alertasService";
 
 // Pill reutilizable
 const Pill = ({ children, variant }) => (
@@ -49,7 +50,7 @@ export default function Empleados() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // para añadir empleados (solo front)
+  // para añadir empleados
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     rut: "",
@@ -96,29 +97,98 @@ export default function Empleados() {
     cargarEmpleadosDesdeAPI();
   }, []);
 
-  // añadir empleado (solo front)
-  const handleAddEmployee = (e) => {
+  // añadir empleado (con POST al backend y registro de alerta)
+  const handleAddEmployee = async (e) => {
     e.preventDefault();
-    if (!form.rut || !form.name || !form.lastname || !form.age) return;
+    
+    if (!form.rut || !form.name || !form.lastname || !form.age) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
 
-    const nuevo = {
-      id: Date.now(),
-      rut: form.rut,
-      name: form.name,
-      lastname: form.lastname,
-      age: form.age,
-      status: form.status,
-    };
+    try {
+      const actividadMap = {
+        "Disponible": "disponible",
+        "En turno": "enturno",
+        "En descanso": "endescanso",
+      };
 
-    setRows((prev) => [...prev, nuevo]);
-    setForm({
-      rut: "",
-      name: "",
-      lastname: "",
-      age: "",
-      status: "Disponible",
-    });
-    setShowForm(false);
+      const payload = {
+        nombre: form.name,
+        apellido: form.lastname,
+        rut: form.rut,
+        edad: parseInt(form.age),
+        actividad: actividadMap[form.status] || "disponible",
+      };
+
+      console.log("📤 Enviando empleado al backend:", payload);
+
+      const resp = await crearEmpleado(payload);
+
+      if (resp.__error) {
+        console.error("❌ Error al crear empleado:", resp);
+        
+        // 📢 Registrar alerta de error
+        alertas.error(
+          `Error al crear empleado: ${form.name} ${form.lastname}`,
+          { rut: form.rut, error: resp }
+        );
+        
+        alert(`No se pudo guardar el empleado. Error: ${JSON.stringify(resp.data || resp)}`);
+        return;
+      }
+
+      console.log("✅ Empleado creado exitosamente:", resp);
+
+      const nuevoEmpleado = {
+        id: resp.id_empleado,
+        rut: resp.rut,
+        name: resp.nombre,
+        lastname: resp.apellido,
+        age: resp.edad,
+        status:
+          resp.actividad === "disponible"
+            ? "Disponible"
+            : resp.actividad === "enturno"
+            ? "En turno"
+            : "En descanso",
+      };
+
+      setRows((prev) => [...prev, nuevoEmpleado]);
+
+      // 📢 Registrar alerta de éxito
+      alertas.success(
+        `Empleado creado: ${resp.nombre} ${resp.apellido}`,
+        { 
+          id: resp.id_empleado,
+          rut: resp.rut,
+          edad: resp.edad,
+          actividad: resp.actividad
+        }
+      );
+
+      setForm({
+        rut: "",
+        name: "",
+        lastname: "",
+        age: "",
+        status: "Disponible",
+      });
+      setShowForm(false);
+
+      alert("✅ Empleado creado exitosamente!");
+
+    } catch (err) {
+      console.error("💥 Excepción completa:", err);
+      
+      // 📢 Registrar alerta de excepción
+      alertas.error(
+        `Excepción al crear empleado: ${err.message}`,
+        { stack: err.stack }
+      );
+      
+      alert(`Error al guardar el empleado: ${err.message}`);
+    }
   };
 
   // pedir confirmación
@@ -128,8 +198,19 @@ export default function Empleados() {
 
   // confirmar eliminación
   const confirmDelete = (id) => {
+    const empleado = rows.find((e) => e.id === id);
+    
     setRows((prev) => prev.filter((e) => e.id !== id));
     setConfirmId(null);
+    
+    // 📢 Registrar alerta de eliminación
+    if (empleado) {
+      alertas.warning(
+        `Empleado eliminado: ${empleado.name} ${empleado.lastname}`,
+        { id: empleado.id, rut: empleado.rut }
+      );
+    }
+    
     // aquí podrías llamar a deleteEmpleado(id) cuando tengas el endpoint
   };
 
