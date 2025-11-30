@@ -3,31 +3,6 @@ import React, { useEffect, useState } from "react";
 import { obtenerAlertas, limpiarAlertas } from "../alertasService";
 
 /* -----------------------------------------
-   Datos de productos en alerta (vacío por ahora)
------------------------------------------ */
-const ALERTAS_PRODUCTOS_MOCK = [];
-
-/* -----------------------------------------
-   Utils visuales
------------------------------------------ */
-const Pill = ({ children, variant }) => (
-  <span className={`pill-alert ${variant}`}>{children}</span>
-);
-
-function pillVariant(estado) {
-  switch (estado) {
-    case "Vencido":
-      return "pill-alert--vencido";
-    case "Por vencer":
-      return "pill-alert--por-vencer";
-    case "En stock bajo":
-      return "pill-alert--stock-bajo";
-    default:
-      return "pill-alert--default";
-  }
-}
-
-/* -----------------------------------------
    Badge para tipo de alerta del log
 ----------------------------------------- */
 function AlertaBadge({ tipo }) {
@@ -79,56 +54,6 @@ export default function Alertas() {
 
   return (
     <div className="alertas-wrapper">
-      {/* ---------- Productos en alerta (sin datos por ahora) ---------- */}
-      <section className="alertas-card">
-        <header className="alertas-card-header">
-          <h2 className="alertas-card-title">Productos en Alerta</h2>
-        </header>
-
-        <div className="alertas-table-container">
-          <table className="table-main">
-            <thead className="table-main-head-alertas">
-              <tr>
-                <th className="table-head-cell-xs">Nombre</th>
-                <th className="table-head-cell-xs">Categoría</th>
-                <th className="table-head-cell-xs">Estado</th>
-                <th className="table-head-cell-xs">Fecha de Vencimiento</th>
-                <th className="table-head-cell-xs">Lote</th>
-                <th className="table-head-cell-xs">Descripción</th>
-              </tr>
-            </thead>
-            <tbody className="table-main-body">
-              {ALERTAS_PRODUCTOS_MOCK.map((alerta) => (
-                <tr key={alerta.id} className="table-main-row">
-                  <td className="table-cell-small-muted">{alerta.nombre}</td>
-                  <td className="table-cell-strong">{alerta.categoria}</td>
-                  <td className="table-cell">
-                    <Pill variant={pillVariant(alerta.estado)}>
-                      {alerta.estado}
-                    </Pill>
-                  </td>
-                  <td className="table-cell-small-muted">
-                    {alerta.fechaVencimiento}
-                  </td>
-                  <td className="table-cell-small-muted">{alerta.lote}</td>
-                  <td className="table-cell-small-muted">
-                    {alerta.descripcion}
-                  </td>
-                </tr>
-              ))}
-
-              {ALERTAS_PRODUCTOS_MOCK.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="table-main-message">
-                    No hay productos en alerta en este momento.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
       {/* ---------- Log de Alertas del Sistema (localStorage) ---------- */}
       <section className="alertas-log-section">
         <div className="alertas-log-header">
@@ -169,7 +94,9 @@ export default function Alertas() {
                       onClick={() => toggleExpanded(alerta.id)}
                       className="alertas-log-toggle-btn"
                     >
-                      {expandedAlertId === alerta.id ? "▼ Ocultar detalles" : "▶ Ver detalles"}
+                      {expandedAlertId === alerta.id
+                        ? "▼ Ocultar detalles"
+                        : "▶ Ver detalles"}
                     </button>
 
                     {expandedAlertId === alerta.id && (
