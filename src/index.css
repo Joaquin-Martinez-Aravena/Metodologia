@@ -11,6 +11,7 @@
   #root {
     @apply h-full w-full;
     margin: 0;
+    padding: 0;
   }
 
   body {
@@ -39,63 +40,91 @@
   }
 }
 
-/*Login page styles */
-@layer components {
-  .login-page-wrapper {
-    @apply flex h-screen w-full items-center justify-center;
-    background-color: #020d38; /* por ejemplo slate-950 */
-  }
+/* === ESTILOS GENERALES VITE (pueden no usarse, pero no molestan) === */
 
-  .login-card {
-    @apply w-96 rounded-lg border border-slate-200 bg-white p-8 shadow-lg
-           dark:border-slate-700 dark:bg-slate-900/80;
-  }
+#root {
+  max-width: 5000px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}
 
-  .login-title {
-    @apply mb-6 text-center text-2xl font-bold text-slate-800 dark:text-slate-100;
-  }
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
 
-  .login-form-group {
-    @apply mb-4;
-  }
+.logo:hover {
+  filter: drop-shadow(0 0 2em #181851aa);
+}
 
-  .login-label {
-    @apply mb-1 block text-sm text-slate-700 dark:text-slate-300;
-  }
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #2090c8aa);
+}
 
-  .login-input {
-    @apply w-full rounded-md border border-slate-300 px-4 py-2 text-sm
-           text-slate-900 outline-none
-           dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100;
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
   }
-
-  .login-error {
-    @apply text-sm text-red-500 dark:text-red-400;
-  }
-
-  .login-button-row {
-    @apply mt-6 flex justify-center;
-  }
-
-  .login-button {
-    @apply rounded-md bg-blue-500 px-6 py-2 text-sm font-medium text-white
-           hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400;
+  to {
+    transform: rotate(360deg);
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
 
+.card {
+  padding: 2em;
+}
 
+.read-the-docs {
+  color: #e11616;
+}
 
+.Menu {
+  margin: -70px;
+  text-align: left;
+  margin-bottom: 2rem;
+}
 
+/* Estado Vencido (rojo suave) */
+.estado-vencido {
+  background-color: #f8d7da;
+  color: #721c24;
+}
 
+/* Estado Por vencer (amarillo suave) */
+.estado-por-vencer {
+  background-color: #fff3cd;
+  color: #856404;
+}
 
-/*apply dark mode styles */
+/* Estado En stock bajo (verde suave) */
+.estado-en-stock-bajo {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+/* ===================================================================
+   COMPONENTES
+=================================================================== */
 @layer components {
-  /* === LOGIN PANEL === */
+  /* =========================================================
+     LOGIN
+     (usado por LoginPanel en App.jsx)
+  ========================================================== */
+
   .login-page-wrapper {
-    @apply flex h-screen w-full items-center justify-center;
-    /* si quieres fondo blanco para el login, cámbialo acá */
-    /* @apply bg-white; */
+    @apply flex h-screen w-full items-center justify-center
+           bg-slate-50 dark:bg-slate-950;
+    /* 👇 Si quieres otro color de fondo del login, cámbialo aquí:
+       ej: background-color: white;  (y puedes borrar el bg-slate-50) */
   }
 
   .login-card {
@@ -122,7 +151,7 @@
   }
 
   .login-button {
-    @apply rounded-md border border-indigo-500 bg-indigo-600 px-3 py-2 text-sm font-medium text-white
+    @apply w-full rounded-md border border-indigo-500 bg-indigo-600 px-3 py-2 text-sm font-medium text-white
            hover:bg-indigo-700 dark:hover:bg-indigo-600;
   }
 
@@ -130,7 +159,10 @@
     @apply mt-4 text-xs text-slate-500 dark:text-slate-400;
   }
 
-  /* === ERROR BOUNDARY === */
+  /* =========================================================
+     ERROR BOUNDARY
+  ========================================================== */
+
   .error-fallback {
     padding: 16px;
     background: #fef2f2;
@@ -150,7 +182,10 @@
     color: #991b1b;
   }
 
-  /* === APP LAYOUT / HEADER === */
+  /* =========================================================
+     APP LAYOUT / HEADER / DASHBOARD
+  ========================================================== */
+
   .app-root {
     min-height: 100vh;
     color: var(--app-fg);
@@ -200,7 +235,6 @@
            dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-100 dark:hover:bg-slate-800 dark:focus:ring-slate-600;
   }
 
-  /* === INVENTORY DASHBOARD === */
   .inventory-dashboard {
     @apply p-4;
   }
@@ -237,17 +271,11 @@
     @apply mt-2 text-xs;
     opacity: 0.8;
   }
-}
 
+  /* =========================================================
+     SIDEBAR
+  ========================================================== */
 
-
-
-
-
-
-/*Sidebar Styles*/
-@layer components {
-  /* === SIDEBAR === */
   .sidebar-root {
     @apply relative h-full;
   }
@@ -312,18 +340,11 @@
            bg-gradient-to-r from-black/10 to-transparent
            dark:from-black/30;
   }
-}
 
+  /* =========================================================
+     GENÉRICOS (badges, pills, tabla, botones)
+  ========================================================== */
 
-
-
-
-
-
-
-/*Estilos de productos*/
-@layer components {
-  /* === BADGES & PILLS === */
   .status-badge {
     @apply inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium;
   }
@@ -338,63 +359,122 @@
            dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-100;
   }
 
+  .status-badge-small {
+    @apply px-2 py-0.5 text-xs;
+  }
+
+  .status-badge--success {
+    @apply border-emerald-200 bg-emerald-100 text-emerald-800
+           dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-100;
+  }
+
+  .status-badge--warning {
+    @apply border-amber-200 bg-amber-100 text-amber-800
+           dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-100;
+  }
+
+  .status-badge--danger {
+    @apply border-rose-200 bg-rose-100 text-rose-800
+           dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-100;
+  }
+
   .pill {
     @apply inline-flex rounded-md border border-slate-200 bg-slate-50 px-4 py-1 text-sm text-slate-600
            dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300;
   }
 
-  /* === MODAL CREAR PRODUCTO === */
-  .modal-backdrop {
-    @apply fixed inset-0 z-50 grid place-items-center bg-black/40 p-4;
+  .table-main {
+    @apply min-w-full divide-y divide-slate-200 dark:divide-slate-700;
   }
 
-  .modal-card {
-    @apply w-full max-w-lg rounded-lg border border-slate-300 bg-white shadow-xl
-           dark:border-slate-700 dark:bg-slate-900;
+  .table-main-head {
+    @apply bg-blue-50 text-slate-600 dark:bg-blue-800 dark:text-slate-300;
   }
 
-  .modal-header {
-    @apply flex items-center justify-between border-b border-slate-200 px-4 py-3
-           dark:border-slate-700;
+  .table-main-head-cell {
+    @apply whitespace-nowrap px-6 py-4 text-left text-base font-semibold;
   }
 
-  .modal-title {
-    @apply text-sm font-semibold text-slate-700 dark:text-slate-200;
+  .table-main-head-cell-sm {
+    @apply px-4 py-3 text-left text-xs font-semibold;
   }
 
-  .modal-close {
+  .table-main-body {
+    @apply divide-y divide-slate-200 dark:divide-slate-700;
+  }
+
+  .table-main-row {
+    @apply hover:bg-slate-50/60 dark:hover:bg-slate-800/40;
+  }
+
+  .table-cell {
+    @apply whitespace-nowrap px-6 py-4 text-base text-slate-700 dark:text-slate-200;
+  }
+
+  .table-cell-muted {
+    @apply whitespace-nowrap px-6 py-4 text-base text-slate-500 dark:text-slate-400;
+  }
+
+  .table-cell-strong {
+    @apply whitespace-nowrap px-6 py-4 text-base font-medium text-slate-800 dark:text-slate-100;
+  }
+
+  .table-cell-total {
+    @apply px-4 py-3 text-sm font-medium text-emerald-600 dark:text-emerald-300;
+  }
+
+  .table-main-message {
+    @apply px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400;
+  }
+
+  .table-main-message-error {
+    @apply px-6 py-8 text-center text-sm text-red-600 dark:text-red-400;
+  }
+
+  .table-head-cell-xs {
+    @apply whitespace-nowrap px-4 py-3 text-left text-xs font-semibold;
+  }
+
+  .table-cell-small-muted {
+    @apply whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400;
+  }
+
+  .table-cell-actions {
+    @apply whitespace-nowrap px-6 py-4 text-sm;
+  }
+
+  /* Botones generales */
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800
+           hover:bg-slate-100
+           dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700;
+  }
+
+  .btn-success-wide {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-sm text-white
+           hover:bg-emerald-700;
+  }
+
+  .btn-success-wide--disabled {
+    @apply cursor-not-allowed bg-emerald-400/60 hover:bg-emerald-400/60;
+  }
+
+  .btn-danger-xs {
+    @apply rounded-md border border-rose-500 bg-rose-600 px-2 py-1 text-xs font-semibold text-white
+           hover:bg-rose-700
+           dark:border-rose-600;
+  }
+
+  .btn-outline-xs {
     @apply rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-700
            hover:bg-slate-100
            dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800;
   }
 
-  .modal-body {
-    @apply grid gap-3 p-4;
-  }
-
-  .modal-field {
-    @apply grid gap-1;
-  }
-
-  .modal-field-text {
-    @apply text-xs text-slate-600 dark:text-slate-300;
-  }
-
-  .modal-input {
-    @apply rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none
-           focus:ring-2 focus:ring-slate-300
-           dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600;
-  }
-
-  .modal-select {
-    @apply rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none
-           focus:ring-2 focus:ring-slate-300
-           dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600;
-  }
-
-  .modal-footer {
-    @apply flex items-center justify-end gap-2 border-t border-slate-200 px-4 py-3
-           dark:border-slate-700;
+  .btn-outline-danger-xs {
+    @apply rounded-md border border-rose-300 px-2 py-1 text-xs text-rose-700
+           hover:bg-rose-50
+           dark:border-rose-700 dark:text-rose-300 dark:hover:bg-rose-900/30;
   }
 
   .btn-secondary {
@@ -411,7 +491,16 @@
     @apply cursor-not-allowed bg-emerald-400/60 hover:bg-emerald-400/60;
   }
 
-  /* === PRODUCTOS LAYOUT === */
+  .btn-delete-main {
+    @apply rounded-md border border-red-500 px-3 py-1 text-xs font-medium text-red-600
+           hover:bg-red-50
+           dark:border-red-400 dark:text-red-300 dark:hover:bg-red-950/40;
+  }
+
+  /* =========================================================
+     PRODUCTOS
+  ========================================================== */
+
   .productos-wrapper {
     @apply mx-auto w-full max-w-[1500px];
   }
@@ -473,81 +562,64 @@
            dark:bg-rose-900/40 dark:text-rose-100;
   }
 
-  /* === TABLA GENÉRICA === */
-  .table-main {
-    @apply min-w-full divide-y divide-slate-200 dark:divide-slate-700;
+  /* Modal Crear Producto */
+  .modal-backdrop {
+    @apply fixed inset-0 z-50 grid place-items-center bg-black/40 p-4;
   }
 
-  .table-main-head {
-    @apply bg-blue-50 text-slate-600 dark:bg-blue-800 dark:text-slate-300;
+  .modal-card {
+    @apply w-full max-w-lg rounded-lg border border-slate-300 bg-white shadow-xl
+           dark:border-slate-700 dark:bg-slate-900;
   }
 
-  .table-main-head-cell {
-    @apply whitespace-nowrap px-6 py-4 text-left text-base font-semibold;
+  .modal-header {
+    @apply flex items-center justify-between border-b border-slate-200 px-4 py-3
+           dark:border-slate-700;
   }
 
-  .table-main-body {
-    @apply divide-y divide-slate-200 dark:divide-slate-700;
+  .modal-title {
+    @apply text-sm font-semibold text-slate-700 dark:text-slate-200;
   }
 
-  .table-main-row {
-    @apply hover:bg-slate-50/60 dark:hover:bg-slate-800/40;
+  .modal-close {
+    @apply rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-700
+           hover:bg-slate-100
+           dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800;
   }
 
-  .table-cell {
-    @apply whitespace-nowrap px-6 py-4 text-base text-slate-700 dark:text-slate-200;
+  .modal-body {
+    @apply grid gap-3 p-4;
   }
 
-  .table-cell-muted {
-    @apply whitespace-nowrap px-6 py-4 text-base text-slate-500 dark:text-slate-400;
+  .modal-field {
+    @apply grid gap-1;
   }
 
-  .table-cell-strong {
-    @apply whitespace-nowrap px-6 py-4 text-base font-medium text-slate-800 dark:text-slate-100;
+  .modal-field-text {
+    @apply text-xs text-slate-600 dark:text-slate-300;
   }
 
-  .table-main-message {
-    @apply px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400;
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-/*Estilo compras*/
-@layer components {
-  /* === STATUS BADGE (compras) === */
-  .status-badge {
-    @apply inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium;
+  .modal-input {
+    @apply rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none
+           focus:ring-2 focus:ring-slate-300
+           dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600;
   }
 
-  .status-badge-small {
-    @apply px-2 py-0.5 text-xs;
+  .modal-select {
+    @apply rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none
+           focus:ring-2 focus:ring-slate-300
+           dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600;
   }
 
-  .status-badge--success {
-    @apply border-emerald-200 bg-emerald-100 text-emerald-800
-           dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-100;
+  .modal-footer {
+    @apply flex items-center justify-end gap-2 border-t border-slate-200 px-4 py-3
+           dark:border-slate-700;
   }
 
-  .status-badge--warning {
-    @apply border-amber-200 bg-amber-100 text-amber-800
-           dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-100;
-  }
+  /* =========================================================
+     COMPRAS
+  ========================================================== */
 
-  .status-badge--danger {
-    @apply border-rose-200 bg-rose-100 text-rose-800
-           dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-100;
-  }
-
-  /* === INPUTS / SELECTS GENERALES === */
   .form-input {
     @apply h-10 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none
            focus:ring-2 focus:ring-slate-300
@@ -560,51 +632,10 @@
            dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:ring-slate-600;
   }
 
-  /* === BOTONES REUTILIZABLES === */
-  .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800
-           hover:bg-slate-100
-           dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700;
+  .compras-wrapper {
+    @apply mx-auto w-full max-w-[2000px] space-y-6 px-2 sm:px-4 lg:px-8 xl:px-10;
   }
 
-  .btn-outline-icon {
-    @apply h-10 rounded-md border border-slate-300 text-slate-700
-           hover:bg-slate-100
-           dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800;
-  }
-
-  .btn-inline-icon {
-    @apply text-lg leading-none;
-  }
-
-  .btn-success-wide {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-sm text-white
-           hover:bg-emerald-700;
-  }
-
-  .btn-success-wide--disabled {
-    @apply cursor-not-allowed bg-emerald-400/60 hover:bg-emerald-400/60;
-  }
-
-  .btn-danger-xs {
-    @apply rounded-md border border-rose-500 bg-rose-600 px-2 py-1 text-xs font-semibold text-white
-           hover:bg-rose-700
-           dark:border-rose-600;
-  }
-
-  .btn-outline-xs {
-    @apply rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-700
-           hover:bg-slate-100
-           dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800;
-  }
-
-  .btn-outline-danger-xs {
-    @apply rounded-md border border-rose-300 px-2 py-1 text-xs text-rose-700
-           hover:bg-rose-50
-           dark:border-rose-700 dark:text-rose-300 dark:hover:bg-rose-900/30;
-  }
-
-  /* === NUEVA COMPRA === */
   .compras-nueva {
     @apply rounded-lg border border-slate-200 bg-[var(--card-bg)] shadow-sm
            dark:border-slate-700;
@@ -655,7 +686,6 @@
     @apply grid gap-2 sm:grid-cols-[1fr_220px];
   }
 
-  /* === HISTORIAL COMPRAS === */
   .compras-historial {
     @apply rounded-lg border border-slate-200 bg-[var(--card-bg)] shadow-sm
            dark:border-slate-700;
@@ -685,52 +715,6 @@
     @apply flex flex-wrap items-center gap-2;
   }
 
-  /* === TABLA (reutiliza las genéricas de Productos) === */
-  .table-main {
-    @apply min-w-full divide-y divide-slate-200 dark:divide-slate-700;
-  }
-
-  .table-main-head {
-    @apply bg-blue-50 text-slate-600 dark:bg-blue-800 dark:text-slate-300;
-  }
-
-  .table-main-head-cell-sm {
-    @apply px-4 py-3 text-left text-xs font-semibold;
-  }
-
-  .table-main-body {
-    @apply divide-y divide-slate-200 dark:divide-slate-700;
-  }
-
-  .table-main-row {
-    @apply hover:bg-slate-50/60 dark:hover:bg-slate-800/40;
-  }
-
-  .table-cell {
-    @apply px-4 py-3 text-sm text-slate-700 dark:text-slate-200;
-  }
-
-  .table-cell-muted {
-    @apply px-4 py-3 text-sm text-slate-600 dark:text-slate-300;
-  }
-
-  .table-cell-strong {
-    @apply px-4 py-3 text-sm font-medium text-slate-800 dark:text-slate-100;
-  }
-
-  .table-cell-total {
-    @apply px-4 py-3 text-sm font-medium text-emerald-600 dark:text-emerald-300;
-  }
-
-  .table-main-message {
-    @apply px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400;
-  }
-
-  /* === LAYOUT VISTA COMPRAS === */
-  .compras-wrapper {
-    @apply mx-auto w-full max-w-[2000px] space-y-6 px-2 sm:px-4 lg:px-8 xl:px-10;
-  }
-
   .compras-error-alert {
     @apply rounded-md border border-rose-500 bg-rose-50 px-4 py-2 text-sm text-rose-700
            dark:border-rose-600 dark:bg-rose-900/20 dark:text-rose-200;
@@ -739,18 +723,11 @@
   .compras-loading {
     @apply text-sm text-slate-500 dark:text-slate-400;
   }
-}
 
+  /* =========================================================
+     EMPLEADOS
+  ========================================================== */
 
-
-
-
-
-
-
-/*Estilos Empleados*/
-@layer components {
-  /* === LAYOUT EMPLEADOS === */
   .empleados-wrapper {
     @apply mx-auto w-full max-w-[1500px];
   }
@@ -774,7 +751,6 @@
            hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500;
   }
 
-  /* === FORM NUEVO EMPLEADO === */
   .empleados-form-container {
     @apply border-b border-slate-200 px-6 py-4 dark:border-slate-700;
   }
@@ -810,7 +786,6 @@
            hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500;
   }
 
-  /* === PILL ESTADOS EMPLEADOS === */
   .pill-status {
     @apply inline-flex items-center rounded-full px-2 py-1 text-xs font-medium border;
   }
@@ -827,58 +802,6 @@
     @apply bg-orange-500/10 text-orange-300 border-orange-500/50;
   }
 
-  /* === TABLA EMPLEADOS (reutiliza genéricos de tabla) === */
-  .table-main {
-    @apply min-w-full divide-y divide-slate-200 dark:divide-slate-700;
-  }
-
-  .table-main-head {
-    @apply bg-blue-50 text-slate-600 dark:bg-blue-800 dark:text-slate-300;
-  }
-
-  .table-main-head-cell {
-    @apply whitespace-nowrap px-6 py-4 text-left text-base font-semibold;
-  }
-
-  .table-main-body {
-    @apply divide-y divide-slate-200 dark:divide-slate-700;
-  }
-
-  .table-main-row {
-    @apply hover:bg-slate-50/60 dark:hover:bg-slate-800/40;
-  }
-
-  .table-cell {
-    @apply whitespace-nowrap px-6 py-4 text-base text-slate-700 dark:text-slate-200;
-  }
-
-  .table-cell-muted {
-    @apply whitespace-nowrap px-6 py-4 text-base text-slate-500 dark:text-slate-400;
-  }
-
-  .table-cell-strong {
-    @apply whitespace-nowrap px-6 py-4 text-base font-medium text-slate-800 dark:text-slate-100;
-  }
-
-  .table-main-message {
-    @apply px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400;
-  }
-
-  .table-main-message-error {
-    @apply px-6 py-8 text-center text-sm text-red-600 dark:text-red-400;
-  }
-
-  .table-cell-actions {
-    @apply whitespace-nowrap px-6 py-4 text-sm;
-  }
-
-  /* === BOTONES ELIMINAR / CONFIRMAR === */
-  .btn-delete-main {
-    @apply rounded-md border border-red-500 px-3 py-1 text-xs font-medium text-red-600
-           hover:bg-red-50
-           dark:border-red-400 dark:text-red-300 dark:hover:bg-red-950/40;
-  }
-
   .empleados-confirm-actions {
     @apply flex items-center gap-2;
   }
@@ -887,24 +810,10 @@
     @apply text-xs text-slate-500 dark:text-slate-400;
   }
 
-  /* btn-danger-xs y btn-outline-xs ya están definidos en Compras:
-     - btn-danger-xs: botón rojo pequeñito
-     - btn-outline-xs: botón neutro pequeñito
-  */
-}
+  /* =========================================================
+     ALERTAS
+  ========================================================== */
 
-
-
-
-
-
-
-
-
-
-/*Estilos Alertas*/
-@layer components {
-  /* ========= ALERTAS: layout general ========= */
   .alertas-wrapper {
     @apply p-6 space-y-6;
   }
@@ -926,20 +835,10 @@
     @apply overflow-x-auto;
   }
 
-  /* ========= Cabezal de tabla invertido (azul) ========= */
   .table-main-head-alertas {
     @apply bg-blue-700 text-white;
   }
 
-  .table-head-cell-xs {
-    @apply whitespace-nowrap px-4 py-3 text-left text-xs font-semibold;
-  }
-
-  .table-cell-small-muted {
-    @apply whitespace-nowrap px-4 py-3 text-xs text-slate-500 dark:text-slate-400;
-  }
-
-  /* ========= Pills de estado para Alertas ========= */
   .pill-alert {
     @apply inline-flex items-center rounded-full px-2 py-1 text-xs font-medium;
   }
@@ -960,7 +859,6 @@
     @apply bg-slate-300 text-slate-700;
   }
 
-  /* ========= Log de alertas ========= */
   .alertas-log-section {
     @apply space-y-2;
   }
