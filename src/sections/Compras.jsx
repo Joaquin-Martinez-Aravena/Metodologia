@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getCompras, crearCompra } from "../api";
+import { getCompras, crearCompra, eliminarCompra } from "../api";
 import { alertas } from "../alertasService";
 
 /* -----------------------------------------
@@ -396,7 +396,6 @@ export default function Compras() {
       if (resp.__error) {
         console.error("❌ Error:", resp);
         
-        // 📢 Registrar alerta de error
         alertas.error(
           `Error al crear compra: ${compraUI.proveedor}`,
           { 
@@ -412,7 +411,6 @@ export default function Compras() {
 
       console.log("✅ Compra guardada exitosamente!");
 
-      // 📢 Registrar alerta de éxito
       alertas.success(
         `Compra creada: ${compraUI.proveedor} - Total: $${compraUI.total.toFixed(2)}`,
         {
@@ -434,7 +432,6 @@ export default function Compras() {
     } catch (err) {
       console.error("💥 Excepción:", err);
       
-      // 📢 Registrar alerta de excepción
       alertas.error(
         `Excepción al crear compra: ${err.message}`,
         { stack: err.stack }
@@ -459,7 +456,6 @@ export default function Compras() {
       )
     );
     
-    // 📢 Registrar cambio de estado
     if (compra) {
       alertas.info(
         `Estado de compra cambiado: ${compra.proveedor} → ${nuevoEstado}`,
@@ -473,13 +469,38 @@ export default function Compras() {
     }
   };
 
-  const deleteCompra = (id) => {
+  const deleteCompra = async (id) => {
     const compra = rows.find((c) => c.id === id);
     
-    setRows((cur) => cur.filter((c) => c.id !== id));
-    
-    // 📢 Registrar alerta de eliminación
-    if (compra) {
+    if (!compra) return;
+
+    try {
+      console.log(`🗑️ Eliminando compra ID: ${id}`);
+
+      // Llamar al endpoint DELETE
+      const resp = await eliminarCompra(id);
+
+      if (resp.__error) {
+        console.error("❌ Error al eliminar compra:", resp);
+        
+        alertas.error(
+          `Error al eliminar compra: ${compra.proveedor}`,
+          {
+            id: compra.id,
+            error: resp
+          }
+        );
+        
+        alert("No se pudo eliminar la compra. Revisa la consola.");
+        return;
+      }
+
+      console.log("✅ Compra eliminada exitosamente");
+
+      // Eliminar de la UI
+      setRows((cur) => cur.filter((c) => c.id !== id));
+      
+      // Registrar alerta de eliminación
       alertas.warning(
         `Compra eliminada: ${compra.proveedor} - $${compra.total.toFixed(2)}`,
         {
@@ -489,6 +510,16 @@ export default function Compras() {
           total: compra.total
         }
       );
+
+    } catch (err) {
+      console.error("💥 Excepción al eliminar compra:", err);
+      
+      alertas.error(
+        `Excepción al eliminar compra: ${err.message}`,
+        { stack: err.stack }
+      );
+      
+      alert("Error inesperado al eliminar la compra.");
     }
   };
 

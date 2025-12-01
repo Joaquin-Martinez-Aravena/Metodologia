@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar.jsx";
 import { Productos, Compras, Empleados, Alertas } from "./sections";
 
@@ -103,8 +103,47 @@ const SECTIONS = {
   alertas: Alertas,
 };
 
-// Dashboard de inventario
+// Dashboard de inventario CONECTADO A LA API
 function InventoryDashboard() {
+  const [stats, setStats] = useState({
+    stockLow: 0,
+    porVencer: 0,
+    vencidos: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function cargarEstadisticas() {
+      try {
+        setLoading(true);
+        
+        const response = await fetch(
+          "https://farmalink-1.onrender.com/api/alertas/resumen"
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("📊 Estadísticas del dashboard:", data);
+
+        setStats({
+          stockLow: data.stock_bajo ?? 0,
+          porVencer: data.por_vencer ?? 0,
+          vencidos: data.vencidos ?? 0,
+        });
+      } catch (err) {
+        console.error("💥 Error al cargar estadísticas del dashboard:", err);
+        // Mantener valores en 0 si falla
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    cargarEstadisticas();
+  }, []);
+
   const StatCard = ({ value, label, tone = "amber" }) => {
     const toneClass =
       tone === "orange"
@@ -115,7 +154,9 @@ function InventoryDashboard() {
 
     return (
       <div className={`stat-card ${toneClass}`}>
-        <div className="stat-card-number">{value}</div>
+        <div className="stat-card-number">
+          {loading ? "..." : value}
+        </div>
         <div className="stat-card-sub">{label}</div>
       </div>
     );
@@ -125,9 +166,9 @@ function InventoryDashboard() {
     <div className="inventory-dashboard">
       <h2 className="inventory-title">Dashboard de Inventario</h2>
       <div className="inventory-grid">
-        <StatCard value={0} label="Stock Bajo" tone="amber" />
-        <StatCard value={1} label="Por Vencer" tone="orange" />
-        <StatCard value={1} label="Vencidos" tone="red" />
+        <StatCard value={stats.stockLow} label="Stock Bajo" tone="amber" />
+        <StatCard value={stats.porVencer} label="Por Vencer" tone="orange" />
+        <StatCard value={stats.vencidos} label="Vencidos" tone="red" />
       </div>
     </div>
   );

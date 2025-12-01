@@ -212,3 +212,35 @@ export async function crearAlertas(body) {
     return { __error: true, status: 0, data: null, error: String(err) };
   }
 }
+
+// DELETE /api/compras/{id_compra}
+export async function eliminarCompra(idCompra) {
+  const url = `${BASE_URL}/api/compras/${idCompra}`;
+  console.log("🔍 DELETE", url);
+
+  try {
+    const res = await fetch(url, {
+      method: "DELETE",
+    });
+
+    // Si es 200 con body, parsear JSON
+    // Si es 204 (No Content), no hay body
+    if (res.status === 204) {
+      console.log("✅ Compra eliminada (204 No Content)");
+      return { success: true };
+    }
+
+    const data = await res.json();
+    console.log("✅ JSON eliminarCompra:", data);
+
+    if (!res.ok) {
+      console.warn("⚠️ Error eliminarCompra:", res.status, data);
+      return { __error: true, status: res.status, data };
+    }
+
+    return data;
+  } catch (err) {
+    console.error("💥 Excepción eliminarCompra:", err);
+    return { __error: true, status: 0, data: null, error: String(err) };
+  }
+}
