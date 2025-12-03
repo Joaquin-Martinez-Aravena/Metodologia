@@ -4,6 +4,8 @@ import os
 import logging
 from dotenv import load_dotenv
 from sqlalchemy import text
+
+from app.routers import pagos
 from .bd_init import run_sql_files
 from .mongodb import init_mongodb, close_mongodb
 from .routers import empleados, productos, proveedores, compras, lotes, alertas, consultas, categorias, alertasmongo
@@ -36,6 +38,7 @@ app.add_middleware(
 
 # Incluir routers
 app.include_router(empleados.router, prefix="/api")
+app.include_router(pagos.router, prefix="/api")
 app.include_router(productos.router, prefix="/api")
 app.include_router(proveedores.router, prefix="/api")
 app.include_router(compras.router, prefix="/api")
