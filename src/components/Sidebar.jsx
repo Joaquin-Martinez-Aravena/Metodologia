@@ -7,6 +7,7 @@ export default function Sidebar({ active, onSelect, role, onLogout }) {
     { key: "compras", label: "Compras", icon: "🛒" },
     ...(role === "admin"
       ? [
+          { key: "pagos", label: "Pagos", icon: "💳" },      // 👈 SOLO ADMIN
           { key: "empleados", label: "Empleados", icon: "👥" },
           { key: "alertas", label: "Alertas", icon: "⚠️" },
         ]

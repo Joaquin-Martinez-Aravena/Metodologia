@@ -1,7 +1,7 @@
 // src/api.js
 
 // URL base del backend en Render (SIN slash final)
-const BASE_URL = (process.env.API_URL || "https://farmalink-1.onrender.com").replace(/\/+$/, "");
+const BASE_URL = (process.env.API_URL || "https://metodologia-api.onrender.com").replace(/\/+$/, "");
 
 // =======================
 //      PRODUCTOS

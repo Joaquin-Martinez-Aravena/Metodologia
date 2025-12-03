@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar.jsx";
-import { Productos, Compras, Empleados, Alertas } from "./sections";
+import { Productos, Compras, Empleados, Alertas, Pagos } from "./sections";
 
 // Usuarios disponibles (mock login)
 const USERS = {
@@ -99,6 +99,7 @@ class ErrorBoundary extends React.Component {
 const SECTIONS = {
   productos: Productos,
   compras: Compras,
+  pagos: Pagos,        // 👈 sigue existiendo, solo admin podrá verlo
   empleados: Empleados,
   alertas: Alertas,
 };
@@ -116,9 +117,9 @@ function InventoryDashboard() {
     async function cargarEstadisticas() {
       try {
         setLoading(true);
-        
+
         const response = await fetch(
-          "https://farmalink-1.onrender.com/api/alertas/resumen"
+          "https://metodologia-api.onrender.com"
         );
 
         if (!response.ok) {
@@ -135,7 +136,6 @@ function InventoryDashboard() {
         });
       } catch (err) {
         console.error("💥 Error al cargar estadísticas del dashboard:", err);
-        // Mantener valores en 0 si falla
       } finally {
         setLoading(false);
       }
@@ -207,16 +207,18 @@ export default function App() {
     sessionStorage.removeItem("farma_user");
   };
 
+  // ⛔ Pagos SOLO para admin
   const allowedKeys =
     user?.role === "admin"
-      ? ["productos", "compras", "empleados", "alertas"]
+      ? ["productos", "compras", "pagos", "empleados", "alertas"] // admin SÍ ve pagos
       : user?.role === "employee"
-      ? ["productos", "compras"]
+      ? ["productos", "compras"]                                  // empleado NO ve pagos
       : [];
 
   const safeSection = allowedKeys.includes(section)
     ? section
     : allowedKeys[0] ?? "";
+
   const CurrentView = useMemo(
     () => SECTIONS[safeSection] ?? (() => null),
     [safeSection]
@@ -241,7 +243,7 @@ export default function App() {
           </div>
         </header>
 
-        {/* LAYOUT PRINCIPAL: SIDEBAR FIJO + CONTENIDO */}
+        {/* LAYOUT PRINCIPAL */}
         <div className="app-layout">
           {/* Sidebar fijo */}
           <aside className="app-sidebar-shell">
