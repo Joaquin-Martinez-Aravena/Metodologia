@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.vscode/
+.idea/
+.git/
+.gitignore
+Dockerfile
+nginx.conf
+test.env
+.env
+.env.*
+*.log
